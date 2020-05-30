@@ -10,6 +10,7 @@ const ObjectId = require('mongodb').ObjectID;
 
 exports.getEvents = (req,res)=>{
       Event.find({})
+      .sort('-createdAt')
       .populate("organiser","_.id name")
       .exec((err,events)=>{
           if(err){
@@ -21,27 +22,24 @@ exports.getEvents = (req,res)=>{
       })
 };
 exports.createEvent = (req,res)=>{
+    const event = new Event(req.body);
+    console.log(req.body);
+    req.body.organiser =mongoose.Types.ObjectId(req.body.organiser);
+    console.log(req.body);
+    event.save((err,ev)=>{
+        if(err){
+            console.log(err);
+            return res.status(400).json({
+                error:"failed here"
+            });
+        }
+        else {
+            console.log(ev);
 
-    let f = formidable.IncomingForm();
-    f.parse(req,(err,fields,file)=>{
-          if(err){
-              return res.status(400).json({
-              error:"something went wrong"  
+            return res.json({
+                message:"event created successfully"
             })
-          }
-          let event = new Event(fields);
-          const {organiser} = fields;
-          event.save((err,event)=>{
-              if(err){
-                  return res.status(404).json({
-                      error:err
-                  });
-              }
-            
-             return  res.json(event);
-          })
-
-          
-    });
-
+        }
+    })
+   
 };

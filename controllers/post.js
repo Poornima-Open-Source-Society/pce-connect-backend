@@ -2,10 +2,12 @@ const Post = require("../models/post");
 const formidable = require('formidable')
 const fs=  require('fs');
 const _ = require('lodash');
-
+const mongoose = require('mongoose');
+const {ObjectId} = mongoose.Schema;
 exports.getAllPost = (req,res)=>{
       Post.find({})
       .select("-photo")
+      .sort("-createdAt")
       .populate("postedBy")
       .exec((err,posts)=>{
           if(err){
@@ -63,4 +65,34 @@ exports.createPost = (req,res)=>{
 
    
 
+};
+
+exports.getPostById = (req,res,next,id)=>{
+  id = mongoose.Types.ObjectId(id);
+  console.log("inside getpostbyid");
+  Post.findById(id)
+  .populate("postedBy")
+  .exec((err,pro)=>{
+    console.log(err);
+    console.log(pro);
+
+    
+   if(err){
+      return res.status(400).json({
+      err:"post not found"
+      });
+     }
+   req.post = pro;
+   next();
+  });    
+      
+}
+
+exports.photo = (req,res,next)=>{
+  console.log(req.post);
+  if(req.post.photo.data){
+   res.set("Content-Type",req.post.photo.contentType);
+   return res.send(req.post.photo.data);
+  }
+   console.log("failed");
 };

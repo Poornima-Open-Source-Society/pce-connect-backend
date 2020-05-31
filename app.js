@@ -27,10 +27,11 @@ try{
          console.log("db not connected");
     };
 app.use(function(req, res, next) {
-      res.header("Access-Control-Allow-Origin", "http://localhost:8100");
+      res.header("Access-Control-Allow-Origin", "https://pce-connect.netlify.app");
       res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
       next();
     });
+app.use(cors());
 app.use(bodyParser.json());
 
     
